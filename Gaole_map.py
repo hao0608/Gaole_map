@@ -38,6 +38,7 @@ for city in city_list:
 
 # 要處理的地址列表
 address_list = []
+store_list = []
 
 for city in city_list:
     for district in city_list[city]:
@@ -46,12 +47,19 @@ for city in city_list:
         html_content = response.text
 
         soup = BeautifulSoup(html_content, "html.parser")
-        address_all = soup.find_all("address")
 
+        # 地址
+        address_all = soup.find_all("address")
         for address in address_all:
             address_list.append(address.text.strip()[:-4])
+        
+        # 店名
+        stores_all=soup.find_all("div", {"class": "store-name"})
+        for store in stores_all:
+            store_list.append(store.find("span", {"class": "font-bold"}).text[5:])
 
-        print(address_list)
-
-df = pd.DataFrame(address_list, columns=["地址"])
+x={}
+x["地址"]=address_list
+x["店名"]=store_list
+df = pd.DataFrame(x)
 df.to_csv("addresses.csv", encoding="utf_8_sig")
